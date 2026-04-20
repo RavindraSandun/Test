@@ -12,7 +12,7 @@ const connectDB = async () => {
     }
 
     try {
-        const uri = process.env.MONGO_URI || 'mongodb+srv://mongodb+srv://test:abc%40123@cluster0.qualuvi.mongodb.net/?appName=Cluster0';
+        const uri = process.env.MONGO_URI || 'mongodb+srv://admin:abc%40123@cluster0.crfbsfn.mongodb.net/?appName=Cluster0';
         const db = await mongoose.connect(uri, {
             serverSelectionTimeoutMS: 5000 // Tweak timeout down so Serverless fails faster instead of hanging
         });
@@ -29,9 +29,9 @@ const connectDB = async () => {
 // -- SCHEMAS --
 
 const UserSchema = new mongoose.Schema({
-    email: { 
-        type: String, 
-        required: true, 
+    email: {
+        type: String,
+        required: true,
         unique: true,
         set: (v) => v ? encrypt(v.toLowerCase()) : v,
         get: (v) => v ? decrypt(v) : v
@@ -83,7 +83,7 @@ const initializeDatabase = async () => {
     try {
         const adminEmailObj = encrypt('admin'); // For lookup
         const adminExists = await User.findOne({ email: adminEmailObj }).collation({ locale: 'en', strength: 2 });
-        
+
         // Also checks legacy unencrypted 'Admin' just in case
         const legacyAdmin = await User.findOne({ email: 'Admin' });
 
@@ -95,14 +95,14 @@ const initializeDatabase = async () => {
                 business_name: 'Admin Portal',
                 role: 'admin'
             });
-            console.log('Admin user created securely.');
-        } else if (legacyAdmin && legacyAdmin.role !== 'admin') {
-            await User.updateOne({ email: 'Admin' }, { role: 'admin' });
-            console.log('Admin role updated for existing admin user.');
-        }
-    } catch (err) {
-        console.error('Error initializing default user:', err.message);
+        console.log('Admin user created securely.');
+    } else if (legacyAdmin && legacyAdmin.role !== 'admin') {
+        await User.updateOne({ email: 'Admin' }, { role: 'admin' });
+        console.log('Admin role updated for existing admin user.');
     }
+} catch (err) {
+    console.error('Error initializing default user:', err.message);
+}
 };
 
 module.exports = {
@@ -112,3 +112,5 @@ module.exports = {
     Product,
     Invoice
 };
+//mongodb+srv://admin:abc%40123@cluster0.crfbsfn.mongodb.net/?appName=Cluster0
+//user:admin, Password: abc@123
