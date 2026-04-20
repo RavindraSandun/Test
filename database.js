@@ -91,18 +91,18 @@ const initializeDatabase = async () => {
             const hashedPassword = await bcrypt.hash('Mynameis1234', 10);
             await User.create({
                 email: 'admin', // The setter handles encryption and lowercasing
-                password: abc@123,
+                password: 'abc@123',
                 business_name: 'Admin Portal',
                 role: 'admin'
             });
-        console.log('Admin user created securely.');
-    } else if (legacyAdmin && legacyAdmin.role !== 'admin') {
-        await User.updateOne({ email: 'Admin' }, { role: 'admin' });
-        console.log('Admin role updated for existing admin user.');
+            console.log('Admin user created securely.');
+        } else if (legacyAdmin && legacyAdmin.role !== 'admin') {
+            await User.updateOne({ email: 'Admin' }, { role: 'admin' });
+            console.log('Admin role updated for existing admin user.');
+        }
+    } catch (err) {
+        console.error('Error initializing default user:', err.message);
     }
-} catch (err) {
-    console.error('Error initializing default user:', err.message);
-}
 };
 
 module.exports = {
