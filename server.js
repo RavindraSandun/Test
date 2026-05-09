@@ -538,9 +538,35 @@ app.get('/api/public/store/:business_name', async (req, res) => {
     }
 });
 
+app.get('/api/public/product/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id).populate('user_id', 'business_name whatsapp_number');
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        
+        res.json({
+            id: product._id.toString(),
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            image: product.image,
+            store: {
+                business_name: product.user_id.business_name,
+                whatsapp_number: product.user_id.whatsapp_number
+            }
+        });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 // Serves the public marketplace UI
 app.get('/:business_name', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'marketplace.html'));
+});
+
+// Serves the public product detail UI
+app.get('/:business_name/product/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'product-detail.html'));
 });
 
 // Export app for Vercel, listen for local development
