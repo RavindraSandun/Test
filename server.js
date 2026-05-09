@@ -508,7 +508,7 @@ app.post('/api/marketplace/enable', async (req, res) => {
 
 app.get('/api/public/store/:business_name', async (req, res) => {
     try {
-        const storeOwner = await User.findOne({ business_name: req.params.business_name });
+        const storeOwner = await User.findOne({ business_name: req.params.business_name }).collation({ locale: 'en', strength: 2 });
         if (!storeOwner || storeOwner.marketplace_enabled !== true) {
             return res.status(404).json({ error: 'Store not found or marketplace is disabled' });
         }
