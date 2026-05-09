@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace</title>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Boxicons for modern icons -->
+    <meta name="description" content="Explore our premium collection and order directly via WhatsApp.">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="/marketplace.css">
 </head>
@@ -14,10 +14,10 @@
     <div class="marketplace-wrapper">
         <header class="store-header" id="store-header">
             <div class="header-content">
-                <div class="store-logo"><i class='bx bx-store'></i></div>
+                <div class="store-logo"><i class='bx bx-store-alt'></i></div>
                 <div class="store-info">
                     <h1 id="store-name">Loading Store...</h1>
-                    <p>Welcome to our official digital storefront</p>
+                    <p id="store-tagline">Premium Collection</p>
                 </div>
             </div>
         </header>
@@ -26,7 +26,7 @@
             <div class="search-bar-container">
                 <div class="search-bar">
                     <i class='bx bx-search'></i>
-                    <input type="text" id="search-input" placeholder="Search for products...">
+                    <input type="text" id="search-input" placeholder="Search our catalog...">
                 </div>
             </div>
             
@@ -34,21 +34,47 @@
                 <!-- Products via JS -->
             </div>
             
-            <div id="no-products" style="display:none; text-align:center; padding: 40px; color: var(--text-muted);">
-                <i class='bx bx-box' style="font-size: 48px; margin-bottom: 16px; opacity:0.5;"></i>
+            <div id="no-products" style="display:none; text-align:center; padding: 60px; color: var(--text-muted);">
+                <i class='bx bx-search-alt' style="font-size: 64px; margin-bottom: 20px; opacity:0.3;"></i>
                 <h2>No products found</h2>
-                <p>Try adjusting your search</p>
+                <p>We couldn't find anything matching your search.</p>
             </div>
             
-            <div id="loading-spinner" style="text-align:center; padding: 60px;">
+            <div id="loading-spinner" style="text-align:center; padding: 100px 24px;">
                 <div class="spinner"></div>
-                <p style="margin-top: 16px; color: var(--text-muted); font-weight: 500;">Loading Products...</p>
+                <p style="margin-top: 20px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.5px;">FETCHING PRODUCTS...</p>
             </div>
         </main>
         
         <footer class="store-footer">
-            <p>Powered by <strong>Ravindra POS</strong> Marketplace</p>
+            <p>Powered by <strong>Ravindra POS</strong> &bull; Secure Marketplace</p>
         </footer>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div class="product-detail-overlay" id="product-detail-overlay">
+        <div class="detail-container">
+            <button class="close-detail" id="btn-close-detail"><i class='bx bx-x'></i></button>
+            <div class="detail-content">
+                <div class="detail-image-side">
+                    <div id="detail-image" class="detail-image-box"></div>
+                </div>
+                <div class="detail-info-side">
+                    <div class="detail-badge">Exclusive</div>
+                    <h2 id="detail-name">Product Name</h2>
+                    <div class="detail-price" id="detail-price">Rs. 0.00</div>
+                    <div class="detail-description-box">
+                        <h3>Description</h3>
+                        <p id="detail-description">Experience the quality of our premium products.</p>
+                    </div>
+                    <div class="detail-actions">
+                        <button class="btn-whatsapp" id="btn-order-whatsapp">
+                            <i class='bx bxl-whatsapp'></i> Order via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="/marketplace.js"></script>
 </body>

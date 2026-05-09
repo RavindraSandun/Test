@@ -195,18 +195,28 @@ function setupNavigation() {
     const btnMarketplace = document.getElementById('btn-create-marketplace');
     if (btnMarketplace) {
         btnMarketplace.addEventListener('click', async () => {
+            if (!currentBusiness) {
+                alert('Business name not found. Please relogin.');
+                return;
+            }
+
+            // Open window immediately to bypass popup blocker
+            const domain = window.location.origin;
+            const url = `${domain}/${encodeURIComponent(currentBusiness)}`;
+            const marketplaceWindow = window.open('about:blank', '_blank');
+
             try {
                 const res = await fetchAuth(`${API_BASE}/marketplace/enable`, { method: 'POST' });
                 if (res.ok) {
-                    const domain = window.location.origin;
-                    const url = `${domain}/${encodeURIComponent(currentBusiness)}`;
-                    // Open the marketplace URL in a new window immediately
-                    window.open(url, '_blank');
+                    // Set the URL now that it's enabled
+                    marketplaceWindow.location.href = url;
                 } else {
+                    marketplaceWindow.close();
                     alert('Failed to enable marketplace. Make sure you have restarted your server.');
                 }
             } catch (err) {
                 console.error(err);
+                marketplaceWindow.close();
                 alert('Error enabling marketplace. Did you restart the server?');
             }
         });
@@ -222,6 +232,7 @@ function setupModals() {
     document.getElementById('btn-add-product').addEventListener('click', () => {
         document.getElementById('product-form').reset();
         document.getElementById('product-id').value = '';
+        document.getElementById('product-description').value = '';
         currentProductImageBase64 = null;
         document.getElementById('product-image-preview').innerHTML = '<span style="color:var(--text-muted);font-size:12px;">+ Add Image</span>';
         document.getElementById('product-modal-title').textContent = 'Add Product';
@@ -274,11 +285,13 @@ function setupModals() {
         e.preventDefault();
         const id = document.getElementById('product-id').value;
         const name = document.getElementById('product-name').value;
+        const description = document.getElementById('product-description').value;
         const qty = document.getElementById('product-qty').value;
         const price = document.getElementById('product-price').value;
         
         const payload = { 
             name, 
+            description,
             quantity: parseInt(qty), 
             price: parseFloat(price),
             image: currentProductImageBase64
@@ -493,6 +506,7 @@ function editProduct(id) {
     if(p) {
         document.getElementById('product-id').value = p.id;
         document.getElementById('product-name').value = p.name;
+        document.getElementById('product-description').value = p.description || '';
         document.getElementById('product-qty').value = p.quantity;
         document.getElementById('product-price').value = p.price;
         

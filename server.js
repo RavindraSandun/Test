@@ -1,3 +1,5 @@
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -264,6 +266,7 @@ app.get('/api/products', async (req, res) => {
         const mappedProducts = products.map(p => ({
             id: p._id.toString(),
             name: p.name,
+            description: p.description,
             quantity: p.quantity,
             price: p.price,
             image: p.image,
@@ -277,7 +280,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-    const { name, quantity, price, image } = req.body;
+    const { name, description, quantity, price, image } = req.body;
     if (!name || quantity === undefined || price === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -286,23 +289,24 @@ app.post('/api/products', async (req, res) => {
         const product = await Product.create({
             user_id: req.user._id,
             name,
+            description,
             quantity,
             price,
             image
         });
-        res.status(201).json({ id: product._id.toString(), name, quantity, price, image });
+        res.status(201).json({ id: product._id.toString(), name, description, quantity, price, image });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 });
 
 app.put('/api/products/:id', async (req, res) => {
-    const { name, quantity, price, image } = req.body;
+    const { name, description, quantity, price, image } = req.body;
     try {
         const queryFilter = req.user.role === 'admin' ? { _id: req.params.id } : { _id: req.params.id, user_id: req.user._id };
         const product = await Product.findOneAndUpdate(
             queryFilter,
-            { name, quantity, price, image },
+            { name, description, quantity, price, image },
             { new: true }
         );
         if (!product) return res.status(404).json({ error: 'Product not found' });
@@ -518,6 +522,7 @@ app.get('/api/public/store/:business_name', async (req, res) => {
         const mappedProducts = products.map(p => ({
             id: p._id.toString(),
             name: p.name,
+            description: p.description,
             price: p.price,
             image: p.image
         }));
