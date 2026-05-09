@@ -266,7 +266,6 @@ app.get('/api/products', async (req, res) => {
         const mappedProducts = products.map(p => ({
             id: p._id.toString(),
             name: p.name,
-            description: p.description,
             quantity: p.quantity,
             price: p.price,
             image: p.image,
@@ -280,7 +279,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-    const { name, description, quantity, price, image } = req.body;
+    const { name, quantity, price, image } = req.body;
     if (!name || quantity === undefined || price === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -289,24 +288,23 @@ app.post('/api/products', async (req, res) => {
         const product = await Product.create({
             user_id: req.user._id,
             name,
-            description,
             quantity,
             price,
             image
         });
-        res.status(201).json({ id: product._id.toString(), name, description, quantity, price, image });
+        res.status(201).json({ id: product._id.toString(), name, quantity, price, image });
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
 });
 
 app.put('/api/products/:id', async (req, res) => {
-    const { name, description, quantity, price, image } = req.body;
+    const { name, quantity, price, image } = req.body;
     try {
         const queryFilter = req.user.role === 'admin' ? { _id: req.params.id } : { _id: req.params.id, user_id: req.user._id };
         const product = await Product.findOneAndUpdate(
             queryFilter,
-            { name, description, quantity, price, image },
+            { name, quantity, price, image },
             { new: true }
         );
         if (!product) return res.status(404).json({ error: 'Product not found' });
@@ -512,7 +510,7 @@ app.post('/api/marketplace/enable', async (req, res) => {
 
 app.get('/api/public/store/:business_name', async (req, res) => {
     try {
-        const storeOwner = await User.findOne({ business_name: req.params.business_name }).collation({ locale: 'en', strength: 2 });
+        const storeOwner = await User.findOne({ business_name: req.params.business_name });
         if (!storeOwner || storeOwner.marketplace_enabled !== true) {
             return res.status(404).json({ error: 'Store not found or marketplace is disabled' });
         }
@@ -522,7 +520,6 @@ app.get('/api/public/store/:business_name', async (req, res) => {
         const mappedProducts = products.map(p => ({
             id: p._id.toString(),
             name: p.name,
-            description: p.description,
             price: p.price,
             image: p.image
         }));
@@ -538,35 +535,9 @@ app.get('/api/public/store/:business_name', async (req, res) => {
     }
 });
 
-app.get('/api/public/product/:id', async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id).populate('user_id', 'business_name whatsapp_number');
-        if (!product) return res.status(404).json({ error: 'Product not found' });
-        
-        res.json({
-            id: product._id.toString(),
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            image: product.image,
-            store: {
-                business_name: product.user_id.business_name,
-                whatsapp_number: product.user_id.whatsapp_number
-            }
-        });
-    } catch (err) {
-        return res.status(500).json({ error: err.message });
-    }
-});
-
 // Serves the public marketplace UI
 app.get('/:business_name', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'marketplace.html'));
-});
-
-// Serves the public product detail UI
-app.get('/:business_name/product/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'product-detail.html'));
 });
 
 // Export app for Vercel, listen for local development
